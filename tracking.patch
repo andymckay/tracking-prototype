@@ -1,0 +1,121 @@
+changeset:   298927:f00a8bf96a8f
+tag:         tip
+parent:      297946:01768e2be2d3
+user:        Andy McKay <amckay@mozilla.com>
+date:        Wed May 25 11:25:12 2016 -0700
+summary:     add in tracking prototype
+
+diff --git a/toolkit/components/extensions/Extension.jsm b/toolkit/components/extensions/Extension.jsm
+--- a/toolkit/components/extensions/Extension.jsm
++++ b/toolkit/components/extensions/Extension.jsm
+@@ -69,32 +69,34 @@ ExtensionManagement.registerScript("chro
+ ExtensionManagement.registerScript("chrome://extensions/content/ext-i18n.js");
+ ExtensionManagement.registerScript("chrome://extensions/content/ext-idle.js");
+ ExtensionManagement.registerScript("chrome://extensions/content/ext-runtime.js");
+ ExtensionManagement.registerScript("chrome://extensions/content/ext-extension.js");
+ ExtensionManagement.registerScript("chrome://extensions/content/ext-webNavigation.js");
+ ExtensionManagement.registerScript("chrome://extensions/content/ext-webRequest.js");
+ ExtensionManagement.registerScript("chrome://extensions/content/ext-storage.js");
+ ExtensionManagement.registerScript("chrome://extensions/content/ext-test.js");
++ExtensionManagement.registerScript("chrome://extensions/content/ext-tracking.js");
+ 
+ const BASE_SCHEMA = "chrome://extensions/content/schemas/manifest.json";
+ 
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/alarms.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/cookies.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/downloads.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/extension.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/extension_types.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/i18n.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/idle.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/notifications.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/runtime.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/storage.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/test.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/web_navigation.json");
+ ExtensionManagement.registerSchema("chrome://extensions/content/schemas/web_request.json");
++ExtensionManagement.registerSchema("chrome://extensions/content/schemas/tracking.json");
+ 
+ Cu.import("resource://gre/modules/ExtensionUtils.jsm");
+ var {
+   BaseContext,
+   LocaleData,
+   Messenger,
+   injectAPI,
+   instanceOf,
+diff --git a/toolkit/components/extensions/ext-tracking.js b/toolkit/components/extensions/ext-tracking.js
+new file mode 100644
+--- /dev/null
++++ b/toolkit/components/extensions/ext-tracking.js
+@@ -0,0 +1,18 @@
++"use strict";
++
++var {classes: Cc, interfaces: Ci, utils: Cu} = Components;
++
++Cu.import("resource://gre/modules/ExtensionUtils.jsm");
++var {
++  detectLanguage,
++} = ExtensionUtils;
++
++extensions.registerSchemaAPI("tracking", null, (extension, context) => {
++  return {
++    tracking: {
++      addRule: function(rule) {
++        // pass
++      },
++    },
++  };
++});
+diff --git a/toolkit/components/extensions/jar.mn b/toolkit/components/extensions/jar.mn
+--- a/toolkit/components/extensions/jar.mn
++++ b/toolkit/components/extensions/jar.mn
+@@ -12,8 +12,9 @@ toolkit.jar:
+     content/extensions/ext-i18n.js
+     content/extensions/ext-idle.js
+     content/extensions/ext-webRequest.js
+     content/extensions/ext-webNavigation.js
+     content/extensions/ext-runtime.js
+     content/extensions/ext-extension.js
+     content/extensions/ext-storage.js
+     content/extensions/ext-test.js
++    content/extensions/ext-tracking.js
+diff --git a/toolkit/components/extensions/schemas/jar.mn b/toolkit/components/extensions/schemas/jar.mn
+--- a/toolkit/components/extensions/schemas/jar.mn
++++ b/toolkit/components/extensions/schemas/jar.mn
+@@ -13,8 +13,9 @@ toolkit.jar:
+     content/extensions/schemas/idle.json
+     content/extensions/schemas/manifest.json
+     content/extensions/schemas/notifications.json
+     content/extensions/schemas/runtime.json
+     content/extensions/schemas/storage.json
+     content/extensions/schemas/test.json
+     content/extensions/schemas/web_navigation.json
+     content/extensions/schemas/web_request.json
++    content/extensions/schemas/tracking.json
+diff --git a/toolkit/components/extensions/schemas/tracking.json b/toolkit/components/extensions/schemas/tracking.json
+new file mode 100644
+--- /dev/null
++++ b/toolkit/components/extensions/schemas/tracking.json
+@@ -0,0 +1,21 @@
++[
++  {
++    "namespace": "tracking",
++    "description": "This is a prototype, use with caution.",
++    "functions": [
++      {
++        "name": "addRule",
++        "type": "function",
++        "description": "Add rule.",
++        "parameters": [
++          {
++            "type": "string",
++            "name": "rule",
++            "description": "The rule to add."
++          }
++        ]
++      }
++    ],
++    "events": []
++  }
++]
+
